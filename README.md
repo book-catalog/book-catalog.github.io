@@ -1,65 +1,47 @@
-# book-catalog.github.io
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Catalog with Barcode</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Book Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Book Catalog with Barcode</h1>
-    </header>
+    <h1>Book Information</h1>
+    <div>
+        <label for="barcode">Scan Barcode:</label>
+        <input type="text" id="barcode" name="barcode" placeholder="Enter ISBN...">
+        <button onclick="fetchBookInfo()">Fetch Info</button>
+    </div>
+    <div id="bookInfo">
+        <!-- Book information will be displayed here -->
+    </div>
 
-    <section id="catalog">
-        <h2>Book Catalog</h2>
-        <div id="bookList">
-            <!-- Books will be dynamically added here -->
-        </div>
-        <button onclick="scanBarcode()">Scan Barcode</button>
-    </section>
-
-    <footer>
-        <p>&copy; 2024 Book Catalog. All rights reserved.</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
     <script>
-        async function scanBarcode() {
-            const codeReader = new ZXing.BrowserBarcodeReader();
-            try {
-                const result = await codeReader.decodeFromVideoDevice(undefined, 'video');
-                const bookCode = result.text;
-                fetchBookDetails(bookCode);
-            } catch (error) {
-                console.error(error);
-            }
-        }
+        function fetchBookInfo() {
+            var isbn = document.getElementById('barcode').value;
+            var apiUrl = 'https://openlibrary.org/api/books?bibkeys=ISBN:' + isbn + '&format=json&jscmd=data';
 
-        async function fetchBookDetails(bookCode) {
-            const apiUrl = `https://openlibrary.org/api/books?bibkeys=ISBN:${bookCode}&format=json&jscmd=data`;
-            try {
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                const bookDetails = data[`ISBN:${bookCode}`];
-                displayBookDetails(bookDetails);
-            } catch (error) {
-                console.error('Error fetching book details:', error);
-            }
-        }
+            $.getJSON(apiUrl, function(data) {
+                if ($.isEmptyObject(data)) {
+                    $('#bookInfo').html('<p>No information found for the ISBN: ' + isbn + '</p>');
+                } else {
+                    var bookData = data['ISBN:' + isbn];
+                    var title = bookData.title;
+                    var authors = bookData.authors.map(author => author.name).join(', ');
+                    var publishDate = bookData.publish_date;
+                    var publisher = bookData.publishers[0].name;
 
-        function displayBookDetails(bookDetails) {
-            const bookList = document.getElementById('bookList');
-            const bookElement = document.createElement('div');
-            bookElement.innerHTML = `
-                <h3>${bookDetails.title}</h3>
-                <p>Author: ${bookDetails.authors[0].name}</p>
-                <p>Publish Date: ${bookDetails.publish_date}</p>
-                <p>Publisher: ${bookDetails.publishers[0].name}</p>
-            `;
-            bookList.appendChild(bookElement);
+                    var bookInfoHTML = '<h2>' + title + '</h2>';
+                    bookInfoHTML += '<p>Author(s): ' + authors + '</p>';
+                    bookInfoHTML += '<p>Publish Date: ' + publishDate + '</p>';
+                    bookInfoHTML += '<p>Publisher: ' + publisher + '</p>';
+
+                    $('#bookInfo').html(bookInfoHTML);
+                }
+            });
         }
     </script>
 </body>
 </html>
+
