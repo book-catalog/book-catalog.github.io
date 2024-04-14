@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,6 +18,10 @@
     </div>
 
     <h2>Add a New Book</h2>
+    <div>
+        <label for="barcode">Barcode (ISBN):</label>
+        <input type="text" id="barcode" name="barcode" placeholder="Enter barcode (ISBN)...">
+    </div>
     <div>
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" placeholder="Enter title...">
@@ -39,6 +44,8 @@
     </div>
 
     <script>
+        var bookMap = {}; // Object to map barcodes (ISBNs) to book details
+
         function fetchBookInfo() {
             var isbn = document.getElementById('isbn').value;
             var apiUrl = 'https://openlibrary.org/api/books?bibkeys=ISBN:' + isbn + '&format=json&jscmd=data';
@@ -59,22 +66,49 @@
                     bookInfoHTML += '<p>Publisher: ' + publisher + '</p>';
 
                     $('#bookInfo').html(bookInfoHTML);
+
+                    // Store book details in bookMap with ISBN as key
+                    bookMap[isbn] = {
+                        title: title,
+                        author: authors,
+                        publishDate: publishDate,
+                        publisher: publisher
+                    };
                 }
             });
         }
 
         function addBook() {
+            var isbn = document.getElementById('barcode').value;
             var title = document.getElementById('title').value;
             var author = document.getElementById('author').value;
             var publishDate = document.getElementById('publishDate').value;
             var publisher = document.getElementById('publisher').value;
 
-            var bookHTML = '<h2>' + title + '</h2>';
-            bookHTML += '<p>Author(s): ' + author + '</p>';
-            bookHTML += '<p>Publish Date: ' + publishDate + '</p>';
-            bookHTML += '<p>Publisher: ' + publisher + '</p>';
+            // Store book details in bookMap with ISBN as key
+            bookMap[isbn] = {
+                title: title,
+                author: author,
+                publishDate: publishDate,
+                publisher: publisher
+            };
 
-            $('#addedBooks').append(bookHTML);
+            // Display added books
+            displayAddedBooks();
+        }
+
+        function displayAddedBooks() {
+            var addedBooksHTML = '';
+            for (var isbn in bookMap) {
+                if (bookMap.hasOwnProperty(isbn)) {
+                    var book = bookMap[isbn];
+                    addedBooksHTML += '<h2>' + book.title + '</h2>';
+                    addedBooksHTML += '<p>Author(s): ' + book.author + '</p>';
+                    addedBooksHTML += '<p>Publish Date: ' + book.publishDate + '</p>';
+                    addedBooksHTML += '<p>Publisher: ' + book.publisher + '</p>';
+                }
+            }
+            $('#addedBooks').html(addedBooksHTML);
         }
     </script>
 </body>
