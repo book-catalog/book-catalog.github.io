@@ -8,8 +8,8 @@
 <body>
     <h1>Book Information</h1>
     <div>
-        <label for="isbn">Enter ISBN:</label>
-        <input type="text" id="isbn" name="isbn" placeholder="Enter ISBN...">
+       <label for="barcode">Barcode (ISBN):</label>
+<input type="text" id="barcode" name="barcode" placeholder="Enter barcode (ISBN)..." onblur="fetchBookInfo()">
         <button onclick="fetchBookInfo()">Fetch Info</button>
     </div>
     <div id="bookInfo">
