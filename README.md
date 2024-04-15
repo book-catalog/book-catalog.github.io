@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -32,15 +33,38 @@
         .bookInfo {
             font-size: 14px;
         }
+        #addBookForm {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>RFID Book Catalog</h1>
+    
+    <!-- Add Book Form -->
+    <form id="addBookForm">
+        <h2>Add New Book</h2>
+        <div>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author" required>
+        </div>
+        <div>
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn" name="isbn" required>
+        </div>
+        <button type="submit">Add Book</button>
+    </form>
+
+    <!-- Book List -->
     <div id="bookList"></div>
 
     <script>
         // Dummy book catalog data (replace with actual data obtained from server)
-        const bookCatalog = [
+        let bookCatalog = [
             { title: "Book 1", author: "Author A", isbn: "ISBN-1" },
             { title: "Book 2", author: "Author B", isbn: "ISBN-2" },
             { title: "Book 3", author: "Author C", isbn: "ISBN-3" }
@@ -75,6 +99,40 @@
                 bookListElem.appendChild(bookCard);
             });
         }
+
+        // Function to handle form submission (add new book)
+        function handleAddBook(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Retrieve form input values
+            const title = document.getElementById("title").value;
+            const author = document.getElementById("author").value;
+            const isbn = document.getElementById("isbn").value;
+
+            // Validate input values
+            if (title.trim() === '' || author.trim() === '' || isbn.trim() === '') {
+                alert("Please provide all book details.");
+                return;
+            }
+
+            // Create new book object
+            const newBook = { title, author, isbn };
+
+            // Add new book to the catalog
+            bookCatalog.push(newBook);
+
+            // Update the displayed book catalog
+            displayBookCatalog();
+
+            // Clear form input fields
+            document.getElementById("title").value = "";
+            document.getElementById("author").value = "";
+            document.getElementById("isbn").value = "";
+        }
+
+        // Event listener for form submission
+        const addBookForm = document.getElementById("addBookForm");
+        addBookForm.addEventListener("submit", handleAddBook);
 
         // Call displayBookCatalog function when the page loads
         document.addEventListener("DOMContentLoaded", () => {
